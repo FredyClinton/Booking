@@ -43,7 +43,8 @@ public class ConfigurationSecuriteApplication {
                                         .requestMatchers(POST, "/change-password").permitAll()
                                         .requestMatchers(POST, "/new-password").permitAll()
                                         .requestMatchers(POST, "/refresh-token").permitAll()
-                                        .requestMatchers(GET, "/api/booking").hasAnyAuthority(
+                                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                                        .requestMatchers(GET, "/api/bookings").hasAnyAuthority(
                                                 "ROLE_" + TypeDeRole.ADMIN.toString(),
                                                 "ROLE_" + TypeDeRole.EMPLOYEE.toString()
                                         )
