@@ -12,14 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import therooster.booking.service.Impl.UsersService;
+import therooster.booking.service.Impl.UsersServiceImpl;
 
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private final UsersService utilisateurService;
+    private final UsersServiceImpl utilisateurService;
     private final JwtService jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 

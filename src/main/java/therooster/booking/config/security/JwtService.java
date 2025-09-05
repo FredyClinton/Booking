@@ -17,7 +17,7 @@ import therooster.booking.entity.RefreshToken;
 import therooster.booking.entity.UserEntity;
 import therooster.booking.exception.TokenNotFoundException;
 import therooster.booking.repository.JwtRepository;
-import therooster.booking.service.Impl.UsersService;
+import therooster.booking.service.Impl.UsersServiceImpl;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -39,7 +39,7 @@ public class JwtService {
     private static final String BEARER = "Bearer ";
 
 
-    private final UsersService utilisateurService;
+    private final UsersServiceImpl utilisateurService;
     private final JwtRepository jwtRepository;
 
     @Value("${app.secret-key}")
