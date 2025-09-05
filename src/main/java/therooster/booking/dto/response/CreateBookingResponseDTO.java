@@ -1,11 +1,15 @@
 package therooster.booking.dto.response;
 
 
+import java.time.Instant;
 import java.util.UUID;
 
-public class CreateBookingResponseDTO {
-    private UUID id;
-    private String clientNote;
-    private String internalNote;
-    private Double price;
+public record CreateBookingResponseDTO(
+        UUID id,
+        Instant appointmentDate,
+        String clientNote,
+        String internalNote,
+        Double price
+) {
+
 }

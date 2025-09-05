@@ -18,7 +18,6 @@ import java.time.Instant;
 @Setter
 public class Booking extends BaseIdUuid {
 
-
     private Instant appointmentDate;
     private String clientNote;
     private String internalNote;
@@ -27,5 +26,5 @@ public class Booking extends BaseIdUuid {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus status = BookingStatus.SUBMITTED;
-    
+
 }
