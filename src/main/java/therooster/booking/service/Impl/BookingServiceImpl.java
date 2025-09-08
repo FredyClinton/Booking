@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
                 || user.getAuthorities().contains("ROLE_ADMIN")
 
         ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User  not authorized");
         }
         this.bookingRepository.deleteById(id);
     }
