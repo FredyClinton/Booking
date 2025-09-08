@@ -1,5 +1,6 @@
 package therooster.booking.service;
 
+import therooster.booking.dto.request.CreateUserRequestDTO;
 import therooster.booking.dto.response.LireUserDTO;
 import therooster.booking.entity.UserEntity;
 
@@ -7,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface UsersService {
-    void inscription(UserEntity user);
+
+    void inscription(CreateUserRequestDTO utilisateur);
 
     void activation(Map<String, String> activation);
 

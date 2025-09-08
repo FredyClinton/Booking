@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import therooster.booking.dto.request.CreateUserRequestDTO;
 import therooster.booking.dto.response.LireUserDTO;
 import therooster.booking.entity.Role;
 import therooster.booking.entity.UserEntity;
@@ -30,6 +31,7 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
     private final UserEntityMapper userEntityMapper;
     private final RoleRepository roleRepository;
 
+
     @Override
     public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.usersRepository.findByEmail(username).orElseThrow(
@@ -39,18 +41,20 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
 
 
     @Override
-    public void inscription(UserEntity utilisateur) {
-        if (!utilisateur.getEmail().contains("@") || !utilisateur.getEmail().contains(".")) {
+    public void inscription(CreateUserRequestDTO utilisateur) {
+        ;
+        if (!utilisateur.email().contains("@") || !utilisateur.email().contains(".")) {
             throw new RuntimeException("Email invalid");
         }
+        UserEntity user = this.userEntityMapper.toClientEntity(utilisateur);
+        String mdpCrypt = passwordEncoder.encode(utilisateur.password());
 
-        var mdpCrypt = passwordEncoder.encode(utilisateur.getPassword());
-        utilisateur.setPassword(mdpCrypt);
+        user.setPassword(mdpCrypt);
 
-        var optionalUser = usersRepository.findByEmail(utilisateur.getEmail());
+        var optionalUser = usersRepository.findByEmail(utilisateur.email());
 
         if (optionalUser.isPresent()) {
-            throw new RuntimeException("Email already in use");
+            throw new RuntimeException("This email is already use");
         }
 
         Role role = roleRepository.findByLibelle(TypeDeRole.CLIENT)
@@ -59,10 +63,10 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
                     newRole.setLibelle(TypeDeRole.CLIENT);
                     return roleRepository.save(newRole); // Sauvegarde explicite
                 });
-        utilisateur.setRole(role);
+        user.setRole(role);
 
-        var user = this.usersRepository.save(utilisateur);
-        this.validationService.enregistrer(user);
+        var saveUser = this.usersRepository.save(user);
+        this.validationService.enregistrer(saveUser);
 
     }
 

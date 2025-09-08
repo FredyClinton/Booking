@@ -1,23 +1,22 @@
 package therooster.booking.entity;
 
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.*;
 import therooster.booking.enums.TypeDeRole;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 
-@Data
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Role extends BaseIdUuid {
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)

@@ -34,7 +34,7 @@ public class AccountController {
     public ResponseEntity<Void> inscription(@RequestBody CreateUserRequestDTO dto) {
 
 
-        this.utilisateurService.inscription(userEntityMapper.toClientEntity(dto));
+        this.utilisateurService.inscription(dto);
         return ResponseEntity.created(URI.create("Inscription réussie. Activez votre compte")).build();
     }
 
