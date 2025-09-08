@@ -27,4 +27,7 @@ public class Booking extends BaseIdUuid {
     @Column(nullable = false)
     private BookingStatus status = BookingStatus.SUBMITTED;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserEntity user;
+
 }

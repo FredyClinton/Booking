@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -35,6 +36,8 @@ public abstract class UserEntity extends BaseIdUuid implements UserDetails {
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private boolean actif = false;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Booking> bookings;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Role role;

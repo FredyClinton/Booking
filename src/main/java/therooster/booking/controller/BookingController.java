@@ -2,9 +2,13 @@ package therooster.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import therooster.booking.dto.request.CreateBookingRequestDTO;
+import therooster.booking.dto.request.PatchBookingRequestDTO;
+import therooster.booking.dto.request.UpdateBookingRequestDTO;
 import therooster.booking.dto.response.CreateBookingResponseDTO;
 import therooster.booking.service.Impl.BookingServiceImpl;
 
@@ -12,21 +16,28 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "bookings")
+@RequestMapping(path = "/api/bookings")
 
 @RequiredArgsConstructor
 public class BookingController {
 
     private final BookingServiceImpl bookingService;
 
+    private static String getPrincipalUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
     @PostMapping
     ResponseEntity<Void> createBooking(
             @RequestBody CreateBookingRequestDTO dto,
-            UriComponentsBuilder ucb) {
-        CreateBookingResponseDTO bookingCreate = this.bookingService.createBooking(dto);
+            UriComponentsBuilder ucb
+    ) {
+        String username = getPrincipalUsername();
+        CreateBookingResponseDTO bookingCreate = this.bookingService.createBooking(dto, username);
 
         URI bookingUrl = ucb
-                .path("api/bookings/{id}")
+                .path("/api/bookings/{id}")
                 .buildAndExpand(bookingCreate.id())
                 .toUri();
         return ResponseEntity.created(bookingUrl).build();
@@ -35,19 +46,37 @@ public class BookingController {
 
     @GetMapping("/{id}")
     ResponseEntity<CreateBookingResponseDTO> getBooking(@PathVariable UUID id) {
-        return ResponseEntity.ok(this.bookingService.getBooking(id));
+        String username = getPrincipalUsername();
+        return ResponseEntity.ok(this.bookingService.getBooking(id, username));
     }
+
 
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteBooking(@PathVariable UUID id) {
-        CreateBookingResponseDTO booking = this.bookingService.getBooking(id);
+        String username = getPrincipalUsername();
+        CreateBookingResponseDTO booking = this.bookingService.getBooking(id, username);
 
         if (booking == null) {
             return ResponseEntity.notFound().build();
         }
-        this.bookingService.deleteBookingById(id);
+        this.bookingService.deleteBookingById(id, username);
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    ResponseEntity<CreateBookingResponseDTO> updateBookingFull(@PathVariable UUID id,
+                                                               @RequestBody UpdateBookingRequestDTO dto) {
+        String username = getPrincipalUsername();
+        CreateBookingResponseDTO updated = this.bookingService.updateBookingFull(id, dto, username);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/{id}")
+    ResponseEntity<CreateBookingResponseDTO> updateBookingPartial(@PathVariable UUID id,
+                                                                  @RequestBody PatchBookingRequestDTO dto) {
+        String username = getPrincipalUsername();
+        CreateBookingResponseDTO updated = this.bookingService.updateBookingPartial(id, dto, username);
+        return ResponseEntity.ok(updated);
+    }
 
 }

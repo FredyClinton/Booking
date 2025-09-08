@@ -18,7 +18,8 @@ public enum TypePermission {
     EMPLOYEE_DELETE_BOOKING,
 
 
-    CLIENT_CREATE_BOOKING, EMPLOYEE_DELETE;
+    CLIENT_CREATE_BOOKING,
+    EMPLOYEE_DELETE;
 
 
     private final String libelle;
