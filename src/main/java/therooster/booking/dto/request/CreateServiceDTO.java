@@ -13,4 +13,5 @@ import therooster.booking.enums.TypeService;
 public class CreateServiceDTO {
     private String description;
     private TypeService type;
+    private Double price;
 }

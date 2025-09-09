@@ -20,4 +20,5 @@ public class ServiceEntity extends BaseIdUuid {
     @Column(nullable = false)
     private TypeService type;
 
+    private Double price;
 }

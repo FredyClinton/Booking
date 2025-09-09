@@ -4,12 +4,13 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import therooster.booking.dto.request.CreateBookingRequestDTO;
 import therooster.booking.dto.response.CreateBookingResponseDTO;
 import therooster.booking.entity.Booking;
 import therooster.booking.enums.BookingStatus;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ServiceMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface BookingMapper {
 
     @Named("stringToBookingStatus")
@@ -27,9 +28,10 @@ public interface BookingMapper {
     @Mapping(target = "appointmentDate", source = "appointmentDate")
     @Mapping(target = "clientNote", source = "clientNote")
     @Mapping(target = "internalNote", source = "internalNote")
-    @Mapping(target = "price", source = "price")
+    // services will be set in service layer using serviceIds
     Booking toEntity(CreateBookingRequestDTO dto);
 
+    @Mapping(target = "services", source = "services")
     CreateBookingResponseDTO toDto(Booking entity);
 }
 

@@ -32,10 +32,16 @@ public interface ServiceMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "description", source = "description")
     @Mapping(target = "type", source = "type")
+    @Mapping(target = "price", source = "price")
     // l'id est généré par la BDD
     ServiceEntity toEntity(CreateServiceDTO dto);
 
     // ServiceEntity -> LireServiceDTO
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "price", source = "price")
     LireServiceDTO toDto(ServiceEntity entity);
 
     // Pour mapper des listes si besoin

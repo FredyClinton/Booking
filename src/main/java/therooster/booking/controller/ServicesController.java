@@ -19,22 +19,29 @@ public class ServicesController {
     private final ServicesService servicesService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<LireServiceDTO> create(@RequestBody CreateServiceDTO dto) {
         LireServiceDTO created = servicesService.createService(dto);
         return ResponseEntity.ok(created);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        servicesService.deleteService(id);
+    @DeleteMapping("/{serviceId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable UUID serviceId) {
+        servicesService.deleteService(serviceId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<LireServiceDTO>> list() {
         return ResponseEntity.ok(servicesService.listServices());
+    }
+
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<LireServiceDTO> getService(@PathVariable UUID serviceId) {
+        LireServiceDTO serviceDTO = this.servicesService.lireServices(serviceId);
+        return ResponseEntity.ok(serviceDTO);
+
     }
 }

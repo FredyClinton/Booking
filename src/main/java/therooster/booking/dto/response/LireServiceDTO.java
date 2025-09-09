@@ -16,4 +16,5 @@ public class LireServiceDTO {
     private UUID id;
     private String description;
     private TypeService type;
+    private Double price;
 }

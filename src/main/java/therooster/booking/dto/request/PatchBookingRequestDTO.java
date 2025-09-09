@@ -19,6 +19,5 @@ public class PatchBookingRequestDTO {
     private Instant appointmentDate;
     private String clientNote;
     private String internalNote;
-    private Double price;
     private BookingStatus status;
 }

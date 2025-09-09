@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,7 +17,6 @@ public class CreateBookingRequestDTO {
     private Instant appointmentDate;
     private String clientNote;
     private String internalNote;
-    private Double price;
-
-
+    // Identifiants des services à associer à la réservation lors de la création
+    private List<UUID> serviceIds;
 }

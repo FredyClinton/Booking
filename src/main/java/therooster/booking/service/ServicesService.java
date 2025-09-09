@@ -12,4 +12,6 @@ public interface ServicesService {
     LireServiceDTO createService(CreateServiceDTO createServiceDTO);
 
     List<LireServiceDTO> listServices();
+
+    LireServiceDTO lireServices(UUID serviceId);
 }

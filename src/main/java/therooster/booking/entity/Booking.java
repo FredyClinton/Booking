@@ -23,7 +23,6 @@ public class Booking extends BaseIdUuid {
     private Instant appointmentDate;
     private String clientNote;
     private String internalNote;
-    private Double price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,5 +39,14 @@ public class Booking extends BaseIdUuid {
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private Set<Employee> employees = new HashSet<>();
+
+    // Many-to-Many: a booking can include multiple services
+    @ManyToMany
+    @JoinTable(
+            name = "booking_services",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    private Set<ServiceEntity> services = new HashSet<>();
 
 }

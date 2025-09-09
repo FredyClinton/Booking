@@ -9,14 +9,18 @@ import therooster.booking.dto.request.PatchBookingRequestDTO;
 import therooster.booking.dto.request.UpdateBookingRequestDTO;
 import therooster.booking.dto.response.CreateBookingResponseDTO;
 import therooster.booking.entity.Booking;
+import therooster.booking.entity.ServiceEntity;
 import therooster.booking.entity.UserEntity;
 import therooster.booking.enums.BookingStatus;
 import therooster.booking.mapper.BookingMapper;
 import therooster.booking.repository.BookingRepository;
+import therooster.booking.repository.ServiceRepository;
 import therooster.booking.repository.UsersRepository;
 import therooster.booking.service.BookingService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UsersRepository usersRepository;
+    private final ServiceRepository serviceRepository;
     private final BookingMapper bookingMapper;
 
     private boolean hasRole(UserEntity user, String role) {
@@ -63,9 +68,17 @@ public class BookingServiceImpl implements BookingService {
         createdBooking.setAppointmentDate(dto.getAppointmentDate());
         createdBooking.setClientNote(dto.getClientNote());
         createdBooking.setInternalNote(dto.getInternalNote());
-        createdBooking.setPrice(dto.getPrice());
         createdBooking.setStatus(BookingStatus.SUBMITTED);
         createdBooking.setUser(user);
+
+        // Associer les services si des IDs sont fournis
+        if (dto.getServiceIds() != null && !dto.getServiceIds().isEmpty()) {
+            Set<ServiceEntity> services = new HashSet<>(serviceRepository.findAllById(dto.getServiceIds()));
+            if (services.size() != dto.getServiceIds().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un ou plusieurs services sont introuvables");
+            }
+            createdBooking.setServices(services);
+        }
 
         Booking bookingSave = this.bookingRepository.save(createdBooking);
 
@@ -105,7 +118,6 @@ public class BookingServiceImpl implements BookingService {
         booking.setAppointmentDate(dto.getAppointmentDate());
         booking.setClientNote(dto.getClientNote());
         booking.setInternalNote(dto.getInternalNote());
-        booking.setPrice(dto.getPrice());
         if (dto.getStatus() != null) {
             booking.setStatus(dto.getStatus());
         }
@@ -129,7 +141,6 @@ public class BookingServiceImpl implements BookingService {
         if (dto.getAppointmentDate() != null) booking.setAppointmentDate(dto.getAppointmentDate());
         if (dto.getClientNote() != null) booking.setClientNote(dto.getClientNote());
         if (dto.getInternalNote() != null) booking.setInternalNote(dto.getInternalNote());
-        if (dto.getPrice() != null) booking.setPrice(dto.getPrice());
         if (dto.getStatus() != null) booking.setStatus(dto.getStatus());
         Booking saved = bookingRepository.save(booking);
         return bookingMapper.toDto(saved);

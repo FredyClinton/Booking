@@ -14,7 +14,6 @@ import therooster.booking.enums.TypeDeRole;
 @Builder
 @Getter
 @Setter
-
 public class Role extends BaseIdUuid {
 
 

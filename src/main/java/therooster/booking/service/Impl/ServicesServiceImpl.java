@@ -40,4 +40,12 @@ public class ServicesServiceImpl implements ServicesService {
         List<ServiceEntity> entities = serviceRepository.findAll();
         return serviceMapper.toDtoList(entities);
     }
+
+    @Override
+    public LireServiceDTO lireServices(UUID serviceId) {
+        ServiceEntity serviceEntity = serviceRepository.findById(serviceId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found")
+        );
+        return serviceMapper.toDto(serviceEntity);
+    }
 }

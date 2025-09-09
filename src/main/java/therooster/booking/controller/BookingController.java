@@ -37,50 +37,50 @@ public class BookingController {
         String username = getPrincipalUsername();
         CreateBookingResponseDTO bookingCreate = this.bookingService.createBooking(dto, username);
         System.out.println("creation de booking");
-        var id = bookingCreate.getId().toString();
+        String bookingId = bookingCreate.getId().toString();
         URI bookingUrl = ucb
-                .path("/api/bookings/{id}")
-                .buildAndExpand(id)
+                .path("/api/bookings/{bookingId}")
+                .buildAndExpand(bookingId)
                 .toUri();
         return ResponseEntity.created(bookingUrl).build();
 
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<CreateBookingResponseDTO> getBooking(@PathVariable UUID id) {
+    @GetMapping("/{bookingId}")
+    ResponseEntity<CreateBookingResponseDTO> getBooking(@PathVariable UUID bookingId) {
         String username = getPrincipalUsername();
-        return ResponseEntity.ok(this.bookingService.getBooking(id, username));
+        return ResponseEntity.ok(this.bookingService.getBooking(bookingId, username));
     }
 
 
-    @DeleteMapping("/{id}")
-    ResponseEntity<Void> deleteBooking(@PathVariable UUID id) {
+    @DeleteMapping("/{bookingId}")
+    ResponseEntity<Void> deleteBooking(@PathVariable UUID bookingId) {
         String username = getPrincipalUsername();
         // Admin-only deletion; service enforces role
-        this.bookingService.deleteBookingById(id, username);
+        this.bookingService.deleteBookingById(bookingId, username);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    ResponseEntity<CreateBookingResponseDTO> updateBookingFull(@PathVariable UUID id,
+    @PutMapping("/{bookingId}")
+    ResponseEntity<CreateBookingResponseDTO> updateBookingFull(@PathVariable UUID bookingId,
                                                                @RequestBody UpdateBookingRequestDTO dto) {
         String username = getPrincipalUsername();
-        CreateBookingResponseDTO updated = this.bookingService.updateBookingFull(id, dto, username);
+        CreateBookingResponseDTO updated = this.bookingService.updateBookingFull(bookingId, dto, username);
         return ResponseEntity.ok(updated);
     }
 
-    @PatchMapping("/{id}")
-    ResponseEntity<CreateBookingResponseDTO> updateBookingPartial(@PathVariable UUID id,
+    @PatchMapping("/{bookingId}")
+    ResponseEntity<CreateBookingResponseDTO> updateBookingPartial(@PathVariable UUID bookingId,
                                                                   @RequestBody PatchBookingRequestDTO dto) {
         String username = getPrincipalUsername();
-        CreateBookingResponseDTO updated = this.bookingService.updateBookingPartial(id, dto, username);
+        CreateBookingResponseDTO updated = this.bookingService.updateBookingPartial(bookingId, dto, username);
         return ResponseEntity.ok(updated);
     }
 
-    @PostMapping("/{id}/request-deletion")
-    ResponseEntity<CreateBookingResponseDTO> requestDeletion(@PathVariable UUID id) {
+    @PostMapping("/{bookingId}/request-deletion")
+    ResponseEntity<CreateBookingResponseDTO> requestDeletion(@PathVariable UUID bookingId) {
         String username = getPrincipalUsername();
-        var dto = this.bookingService.requestDeletion(id, username);
+        var dto = this.bookingService.requestDeletion(bookingId, username);
         return ResponseEntity.ok(dto);
     }
 

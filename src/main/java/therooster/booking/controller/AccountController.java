@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/accounts", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AccountController {
 
@@ -100,11 +100,11 @@ public class AccountController {
         return ResponseEntity.ok(users);
     }
 
-    @DeleteMapping()
-    public ResponseEntity<Void> deleteAccount(@PathVariable UUID id) {
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable UUID accountId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserUsername = authentication.getName();
-        this.utilisateurService.deleteUser(id, currentUserUsername);
+        this.utilisateurService.deleteUser(accountId, currentUserUsername);
         return ResponseEntity.noContent().build();
 
     }
