@@ -36,8 +36,10 @@ public abstract class UserEntity extends BaseIdUuid implements UserDetails {
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private boolean actif = false;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Booking> bookings;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Role role;

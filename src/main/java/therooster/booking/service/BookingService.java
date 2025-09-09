@@ -5,6 +5,7 @@ import therooster.booking.dto.request.PatchBookingRequestDTO;
 import therooster.booking.dto.request.UpdateBookingRequestDTO;
 import therooster.booking.dto.response.CreateBookingResponseDTO;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BookingService {
@@ -17,4 +18,6 @@ public interface BookingService {
     CreateBookingResponseDTO updateBookingFull(UUID id, UpdateBookingRequestDTO dto, String username);
 
     CreateBookingResponseDTO updateBookingPartial(UUID id, PatchBookingRequestDTO dto, String username);
+
+    List<CreateBookingResponseDTO> getAllBookings(String username);
 }

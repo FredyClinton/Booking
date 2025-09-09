@@ -13,6 +13,7 @@ import therooster.booking.dto.response.CreateBookingResponseDTO;
 import therooster.booking.service.Impl.BookingServiceImpl;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,10 +36,11 @@ public class BookingController {
     ) {
         String username = getPrincipalUsername();
         CreateBookingResponseDTO bookingCreate = this.bookingService.createBooking(dto, username);
-
+        System.out.println("creation de booking");
+        var id = bookingCreate.id().toString();
         URI bookingUrl = ucb
                 .path("/api/bookings/{id}")
-                .buildAndExpand(bookingCreate.id())
+                .buildAndExpand(id)
                 .toUri();
         return ResponseEntity.created(bookingUrl).build();
 
@@ -77,6 +79,12 @@ public class BookingController {
         String username = getPrincipalUsername();
         CreateBookingResponseDTO updated = this.bookingService.updateBookingPartial(id, dto, username);
         return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping
+    ResponseEntity<List<CreateBookingResponseDTO>> listMyBookings() {
+        String username = getPrincipalUsername();
+        return ResponseEntity.ok(this.bookingService.getAllBookings(username));
     }
 
 }

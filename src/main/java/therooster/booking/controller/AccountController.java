@@ -15,7 +15,6 @@ import therooster.booking.dto.request.CreateUserRequestDTO;
 import therooster.booking.mapper.UserEntityMapper;
 import therooster.booking.service.UsersService;
 
-import java.net.URI;
 import java.util.Map;
 
 @Slf4j
@@ -35,14 +34,14 @@ public class AccountController {
 
 
         this.utilisateurService.inscription(dto);
-        return ResponseEntity.created(URI.create("Inscription réussie. Activez votre compte")).build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/activation")
-    public ResponseEntity<Void> activation(@RequestBody Map<String, String> activation) {
+    public ResponseEntity<String> activation(@RequestBody Map<String, String> activation) {
 
         this.utilisateurService.activation(activation);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Compte activé");
     }
 
     @PostMapping(path = "/connexion")

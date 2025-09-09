@@ -25,8 +25,9 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Override
     public void enregistrer(UserEntity utilisateur) {
+        System.out.println("validation");
         Validation validation = new Validation();
-        validation.setUtilisateur(utilisateur);
+        validation.setUser(utilisateur);
 
 
         Instant creation = Instant.now();

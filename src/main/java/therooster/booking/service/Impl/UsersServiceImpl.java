@@ -19,6 +19,7 @@ import therooster.booking.service.UsersService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,16 +43,22 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
 
     @Override
     public void inscription(CreateUserRequestDTO utilisateur) {
-        ;
-        if (!utilisateur.email().contains("@") || !utilisateur.email().contains(".")) {
+
+        System.out.println("inscription");
+        String email = utilisateur.email();
+        if (email == null || email.isBlank() || !email.contains("@") || !email.contains(".")) {
             throw new RuntimeException("Email invalid");
         }
+        String rawPassword = utilisateur.password();
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new RuntimeException("Password invalid");
+        }
         UserEntity user = this.userEntityMapper.toClientEntity(utilisateur);
-        String mdpCrypt = passwordEncoder.encode(utilisateur.password());
-
+        String mdpCrypt = passwordEncoder.encode(rawPassword);
+        System.out.println("fin du mapping");
         user.setPassword(mdpCrypt);
 
-        var optionalUser = usersRepository.findByEmail(utilisateur.email());
+        Optional<UserEntity> optionalUser = usersRepository.findByEmail(utilisateur.email());
 
         if (optionalUser.isPresent()) {
             throw new RuntimeException("This email is already use");
@@ -60,12 +67,15 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
         Role role = roleRepository.findByLibelle(TypeDeRole.CLIENT)
                 .orElseGet(() -> {
                     Role newRole = new Role();
+                    System.out.println("new role");
                     newRole.setLibelle(TypeDeRole.CLIENT);
+                    System.out.println("save role");
                     return roleRepository.save(newRole); // Sauvegarde explicite
                 });
         user.setRole(role);
-
+        System.out.println("set role");
         var saveUser = this.usersRepository.save(user);
+        System.out.println("saveUser ");
         this.validationService.enregistrer(saveUser);
 
     }
@@ -76,7 +86,7 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
         if (!Instant.now().isBefore(validation.getExpiration())) {
             throw new RuntimeException("Activation code expired");
         }
-        var utilisateurAActiver = this.usersRepository.findById(validation.getUtilisateur().getId())
+        var utilisateurAActiver = this.usersRepository.findById(validation.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         utilisateurAActiver.setActif(true);
@@ -97,7 +107,7 @@ public class UsersServiceImpl implements UserDetailsService, UsersService {
 
         UserEntity utilisateur = this.loadUserByUsername(params.get("email"));
         Validation validation = this.validationService.lireEnFonctionDuCode(params.get("code"));
-        if (validation.getUtilisateur().getEmail().equals(utilisateur.getEmail())) {
+        if (validation.getUser().getEmail().equals(utilisateur.getEmail())) {
             String mdpCrypt = this.passwordEncoder.encode(params.get("password"));
             utilisateur.setPassword(mdpCrypt);
             this.usersRepository.save(utilisateur);

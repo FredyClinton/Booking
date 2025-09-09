@@ -25,9 +25,10 @@ public class Booking extends BaseIdUuid {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status = BookingStatus.SUBMITTED;
+    private BookingStatus status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
+
 
 }

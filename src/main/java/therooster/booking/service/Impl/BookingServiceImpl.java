@@ -16,6 +16,7 @@ import therooster.booking.repository.BookingRepository;
 import therooster.booking.repository.UsersRepository;
 import therooster.booking.service.BookingService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getUser() == null || user.getId() == null
                 || booking.getUser().getId() == null
                 || !booking.getUser().getId().equals(user.getId())
-                || user.getAuthorities().contains("ROLE_ADMIN")
+                || !user.getAuthorities().contains("ROLE_ADMIN")
 
         ) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User  not authorized");
@@ -66,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public CreateBookingResponseDTO getBooking(UUID id, String username) {
         UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+                () -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Acces non autorisé")
         );
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
@@ -118,6 +119,18 @@ public class BookingServiceImpl implements BookingService {
         if (dto.status() != null) booking.setStatus(dto.status());
         Booking saved = bookingRepository.save(booking);
         return bookingMapper.toDto(saved);
+    }
+
+    @Override
+    public List<CreateBookingResponseDTO> getAllBookings(String username) {
+        UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        List<Booking> bookings = bookingRepository.findByUser_Email(user.getEmail());
+        // TODO: MAPPING PAS BON. TOUT EST NULL
+        return bookings.stream()
+                .map(bookingMapper::toDto)
+                .toList();
     }
 }
 
