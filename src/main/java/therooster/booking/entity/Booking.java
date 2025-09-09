@@ -9,6 +9,8 @@ import lombok.Setter;
 import therooster.booking.enums.BookingStatus;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bookings")
@@ -25,10 +27,18 @@ public class Booking extends BaseIdUuid {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status;
+    private BookingStatus status = BookingStatus.SUBMITTED;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
 
+    // Many-to-Many: a booking can be handled by multiple employees
+    @ManyToMany
+    @JoinTable(
+            name = "booking_employees",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
+    private Set<Employee> employees = new HashSet<>();
 
 }

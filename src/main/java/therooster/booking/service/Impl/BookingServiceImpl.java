@@ -27,6 +27,14 @@ public class BookingServiceImpl implements BookingService {
     private final UsersRepository usersRepository;
     private final BookingMapper bookingMapper;
 
+    private boolean hasRole(UserEntity user, String role) {
+        return user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
+    }
+
+    private boolean isAssignedToEmployee(Booking booking, String email) {
+        return booking.getEmployees() != null && booking.getEmployees().stream().anyMatch(e -> email.equals(e.getEmail()));
+    }
+
     @Override
     public void deleteBookingById(UUID id, String username) {
         UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
@@ -34,15 +42,15 @@ public class BookingServiceImpl implements BookingService {
         );
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
-        // Only the owner can delete their own booking for now
-        if (booking.getUser() == null || user.getId() == null
-                || booking.getUser().getId() == null
-                || !booking.getUser().getId().equals(user.getId())
-                || !user.getAuthorities().contains("ROLE_ADMIN")
 
-        ) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User  not authorized");
+        // Only ADMIN can delete, and optionally only if pending deletion
+        if (!hasRole(user, "ROLE_ADMIN")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admin can delete bookings");
         }
+        // Admin deletes regardless of owner; if you want to enforce pending state, uncomment next lines
+        // if (booking.getStatus() != BookingStatus.PENDING_DELETION) {
+        //     throw new ResponseStatusException(HttpStatus.CONFLICT, "Deletion not requested");
+        // }
         this.bookingRepository.deleteById(id);
     }
 
@@ -51,13 +59,13 @@ public class BookingServiceImpl implements BookingService {
         UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
-        Booking createdBooking = new Booking(
-                dto.appointmentDate(),
-                dto.clientNote(),
-                dto.internalNote(),
-                dto.price(),
-                BookingStatus.SUBMITTED,
-                user);
+        Booking createdBooking = new Booking();
+        createdBooking.setAppointmentDate(dto.getAppointmentDate());
+        createdBooking.setClientNote(dto.getClientNote());
+        createdBooking.setInternalNote(dto.getInternalNote());
+        createdBooking.setPrice(dto.getPrice());
+        createdBooking.setStatus(BookingStatus.SUBMITTED);
+        createdBooking.setUser(user);
 
         Booking bookingSave = this.bookingRepository.save(createdBooking);
 
@@ -72,7 +80,11 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
 
-        if (booking.getUser() == null || user.getId() == null || booking.getUser().getId() == null || !booking.getUser().getId().equals(user.getId())) {
+        boolean isOwner = booking.getUser() != null && booking.getUser().getEmail() != null && booking.getUser().getEmail().equals(user.getEmail());
+        boolean isAdmin = hasRole(user, "ROLE_ADMIN");
+        boolean isAssigned = isAssignedToEmployee(booking, user.getEmail());
+
+        if (!(isOwner || isAdmin || isAssigned)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
         }
         return bookingMapper.toDto(booking);
@@ -85,16 +97,17 @@ public class BookingServiceImpl implements BookingService {
         );
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
-        if (booking.getUser() == null || user.getId() == null || booking.getUser().getId() == null || !booking.getUser().getId().equals(user.getId())) {
+        boolean isOwner = booking.getUser() != null && booking.getUser().getEmail() != null && booking.getUser().getEmail().equals(user.getEmail());
+        if (!isOwner) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
         }
         // Full replace of updatable fields
-        booking.setAppointmentDate(dto.appointmentDate());
-        booking.setClientNote(dto.clientNote());
-        booking.setInternalNote(dto.internalNote());
-        booking.setPrice(dto.price());
-        if (dto.status() != null) {
-            booking.setStatus(dto.status());
+        booking.setAppointmentDate(dto.getAppointmentDate());
+        booking.setClientNote(dto.getClientNote());
+        booking.setInternalNote(dto.getInternalNote());
+        booking.setPrice(dto.getPrice());
+        if (dto.getStatus() != null) {
+            booking.setStatus(dto.getStatus());
         }
         Booking saved = bookingRepository.save(booking);
         return bookingMapper.toDto(saved);
@@ -108,15 +121,16 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
-        if (booking.getUser() == null || user.getId() == null || booking.getUser().getId() == null || !booking.getUser().getId().equals(user.getId())) {
+        boolean isOwner = booking.getUser() != null && booking.getUser().getEmail() != null && booking.getUser().getEmail().equals(user.getEmail());
+        if (!isOwner) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
         }
         // Partial update: only non-null fields are applied
-        if (dto.appointmentDate() != null) booking.setAppointmentDate(dto.appointmentDate());
-        if (dto.clientNote() != null) booking.setClientNote(dto.clientNote());
-        if (dto.internalNote() != null) booking.setInternalNote(dto.internalNote());
-        if (dto.price() != null) booking.setPrice(dto.price());
-        if (dto.status() != null) booking.setStatus(dto.status());
+        if (dto.getAppointmentDate() != null) booking.setAppointmentDate(dto.getAppointmentDate());
+        if (dto.getClientNote() != null) booking.setClientNote(dto.getClientNote());
+        if (dto.getInternalNote() != null) booking.setInternalNote(dto.getInternalNote());
+        if (dto.getPrice() != null) booking.setPrice(dto.getPrice());
+        if (dto.getStatus() != null) booking.setStatus(dto.getStatus());
         Booking saved = bookingRepository.save(booking);
         return bookingMapper.toDto(saved);
     }
@@ -126,11 +140,34 @@ public class BookingServiceImpl implements BookingService {
         UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
-        List<Booking> bookings = bookingRepository.findByUser_Email(user.getEmail());
-        // TODO: MAPPING PAS BON. TOUT EST NULL
+
+        List<Booking> bookings;
+        if (hasRole(user, "ROLE_ADMIN")) {
+            bookings = bookingRepository.findAll();
+        } else if (hasRole(user, "ROLE_EMPLOYEE")) {
+            bookings = bookingRepository.findDistinctByEmployees_Email(user.getEmail());
+        } else {
+            bookings = bookingRepository.findByUser_Email(user.getEmail());
+        }
+
         return bookings.stream()
                 .map(bookingMapper::toDto)
                 .toList();
+    }
+
+    // Employee requests deletion -> mark as PENDING_DELETION
+    public CreateBookingResponseDTO requestDeletion(UUID id, String username) {
+        UserEntity user = this.usersRepository.findByEmail(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
+        if (!hasRole(user, "ROLE_EMPLOYEE") || !isAssignedToEmployee(booking, user.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed to request deletion");
+        }
+        booking.setStatus(BookingStatus.PENDING_DELETION);
+        Booking saved = bookingRepository.save(booking);
+        return bookingMapper.toDto(saved);
     }
 }
 

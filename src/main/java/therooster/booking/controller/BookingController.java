@@ -37,7 +37,7 @@ public class BookingController {
         String username = getPrincipalUsername();
         CreateBookingResponseDTO bookingCreate = this.bookingService.createBooking(dto, username);
         System.out.println("creation de booking");
-        var id = bookingCreate.id().toString();
+        var id = bookingCreate.getId().toString();
         URI bookingUrl = ucb
                 .path("/api/bookings/{id}")
                 .buildAndExpand(id)
@@ -56,11 +56,7 @@ public class BookingController {
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteBooking(@PathVariable UUID id) {
         String username = getPrincipalUsername();
-        CreateBookingResponseDTO booking = this.bookingService.getBooking(id, username);
-
-        if (booking == null) {
-            return ResponseEntity.notFound().build();
-        }
+        // Admin-only deletion; service enforces role
         this.bookingService.deleteBookingById(id, username);
         return ResponseEntity.noContent().build();
     }
@@ -79,6 +75,13 @@ public class BookingController {
         String username = getPrincipalUsername();
         CreateBookingResponseDTO updated = this.bookingService.updateBookingPartial(id, dto, username);
         return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/{id}/request-deletion")
+    ResponseEntity<CreateBookingResponseDTO> requestDeletion(@PathVariable UUID id) {
+        String username = getPrincipalUsername();
+        var dto = this.bookingService.requestDeletion(id, username);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
