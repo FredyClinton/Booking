@@ -13,35 +13,51 @@ import java.util.stream.Collectors;
 
 import static therooster.booking.enums.TypePermission.*;
 
-
 @Getter
 @AllArgsConstructor
 public enum TypeDeRole {
     CLIENT(
-            Set.of(CLIENT_CREATE_BOOKING)
+            Set.of(CREATE_BOOKING,
+                    READ_MY_BOOKING,
+                    UPDATE_MY_BOOKING,
+                    PATH_MY_BOOKING,
+                    DELETE_MY_BOOKING
+            )
     ),
 
     EMPLOYEE(
             Set.of(
-
-                    EMPLOYEE_CREATE,
-                    EMPLOYEE_UPDATE,
-                    EMPLOYEE_READ,
-                    EMPLOYEE_DELETE_BOOKING
+                    CREATE_BOOKING,
+                    UPDATE_BOOKING,
+                    PATH_BOOKING,
+                    READ_BOOKING,
+                    READ_SCHEDULE,
+                    CREATE_SCHEDULE,
+                    READ_SERVICE,
+                    DELETE_SCHEDULE
             )
     ),
 
     ADMIN(
             Set.of(
-                    ADMIN_CREATE,
-                    ADMIN_UPDATE,
-                    ADMIN_DELETE,
-                    ADMIN_READ,
+                    CREATE_BOOKING,
+                    UPDATE_BOOKING,
+                    PATH_BOOKING,
+                    UPDATE_MY_BOOKING,
+                    PATH_MY_BOOKING,
+                    DELETE_BOOKING,
+                    DELETE_MY_BOOKING,
+                    READ_ALL_BOOKING,
+                    CREATE_SERVICE,
+                    UPDATE_SERVICE,
+                    PATH_SERVICE,
+                    DELETE_SERVICE,
+                    READ_ALL_SERVICE,
+                    READ_MY_BOOKING,
+                    READ_BOOKING,
+                    READ_SCHEDULE,
+                    READ_SERVICE
 
-                    EMPLOYEE_CREATE,
-                    EMPLOYEE_UPDATE,
-                    EMPLOYEE_READ,
-                    EMPLOYEE_DELETE
             )
     );
 

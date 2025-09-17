@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import therooster.booking.entity.Admin;
+import therooster.booking.entity.Employee;
 import therooster.booking.entity.Role;
 import therooster.booking.enums.TypeDeRole;
 import therooster.booking.repository.RoleRepository;
@@ -44,6 +45,35 @@ public class BookingApplication {
                 // In UserEntity, 'actif' gates account flags; set true
                 admin.setActif(true);
                 usersRepository.save(admin);
+            }
+        };
+    }
+
+
+    @Bean
+    public CommandLineRunner initEmployeeUser(UsersRepository usersRepository,
+                                              RoleRepository roleRepository,
+                                              BCryptPasswordEncoder passwordEncoder) {
+        return args -> {
+            // Ensure ADMIN role exists
+            Role employeeRole = roleRepository.findByLibelle(TypeDeRole.EMPLOYEE)
+                    .orElseGet(() -> roleRepository.save(Role.builder().libelle(TypeDeRole.EMPLOYEE).build()));
+
+            // Create default employee if not exists
+            String employeeEmail = "employee@local";
+            if (!usersRepository.existsByEmail(employeeEmail)) {
+                Employee employee = new Employee();
+                employee.setFirstName("Local");
+                employee.setLastName("Employee");
+                employee.setEmail(employeeEmail);
+                employee.setPassword(passwordEncoder.encode("employee123"));
+                employee.setPhone("0000000000");
+                employee.setBirthDate(new Date());
+                employee.setRole(employeeRole);
+                // activate admin account
+                // In UserEntity, 'actif' gates account flags; set true
+                employee.setActif(true);
+                usersRepository.save(employee);
             }
         };
     }

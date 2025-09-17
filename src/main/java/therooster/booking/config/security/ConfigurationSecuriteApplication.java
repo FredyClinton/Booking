@@ -35,12 +35,12 @@ public class ConfigurationSecuriteApplication {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorize ->
-                                authorize.requestMatchers(POST, "/inscription").permitAll()
-                                        .requestMatchers(POST, "/activation").permitAll()
-                                        .requestMatchers(POST, "/connexion").permitAll()
-                                        .requestMatchers(POST, "/change-password").permitAll()
-                                        .requestMatchers(POST, "/new-password").permitAll()
-                                        .requestMatchers(POST, "/refresh-token").permitAll()
+                                authorize.requestMatchers(POST, "/api/accounts/inscription").permitAll()
+                                        .requestMatchers(POST, "/api/accounts/activation").permitAll()
+                                        .requestMatchers(POST, "/api/accounts/connexion").permitAll()
+                                        .requestMatchers(POST, "/api/accounts/change-password").permitAll()
+                                        .requestMatchers(POST, "/api/accounts/new-password").permitAll()
+                                        .requestMatchers(POST, "/api/accounts/refresh-token").permitAll()
                                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                                         /* .requestMatchers(GET, "/api/bookings").hasAnyAuthority(
                                                  "ROLE_" + TypeDeRole.ADMIN.toString(),

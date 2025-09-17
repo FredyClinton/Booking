@@ -31,12 +31,15 @@ public class Booking extends BaseIdUuid {
     @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    private Addresse addresse;
+
     // Many-to-Many: a booking can be handled by multiple employees
     @ManyToMany
     @JoinTable(
             name = "booking_employees",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id")
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id")
     )
     private Set<Employee> employees = new HashSet<>();
 
@@ -44,8 +47,8 @@ public class Booking extends BaseIdUuid {
     @ManyToMany
     @JoinTable(
             name = "booking_services",
-            joinColumns = @JoinColumn(name = "booking_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id")
     )
     private Set<ServiceEntity> services = new HashSet<>();
 

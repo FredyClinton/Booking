@@ -19,5 +19,5 @@ public interface BookingService {
 
     CreateBookingResponseDTO updateBookingPartial(UUID id, PatchBookingRequestDTO dto, String username);
 
-    List<CreateBookingResponseDTO> getAllBookings(String username);
+    List<CreateBookingResponseDTO> getAllBookings();
 }

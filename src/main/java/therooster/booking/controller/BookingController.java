@@ -18,7 +18,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/bookings")
-
 @RequiredArgsConstructor
 public class BookingController {
 
@@ -79,15 +78,15 @@ public class BookingController {
 
     @PostMapping("/{bookingId}/request-deletion")
     ResponseEntity<CreateBookingResponseDTO> requestDeletion(@PathVariable UUID bookingId) {
-        String username = getPrincipalUsername();
-        var dto = this.bookingService.requestDeletion(bookingId, username);
+
+        CreateBookingResponseDTO dto = this.bookingService.requestDeletion(bookingId);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping
     ResponseEntity<List<CreateBookingResponseDTO>> listMyBookings() {
-        String username = getPrincipalUsername();
-        return ResponseEntity.ok(this.bookingService.getAllBookings(username));
+
+        return ResponseEntity.ok(this.bookingService.getAllBookings());
     }
 
 }

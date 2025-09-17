@@ -1,10 +1,6 @@
 package therooster.booking.mapper;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import therooster.booking.dto.request.CreateBookingRequestDTO;
 import therooster.booking.dto.response.CreateBookingResponseDTO;
 import therooster.booking.entity.Booking;
@@ -28,7 +24,8 @@ public interface BookingMapper {
     @Mapping(target = "appointmentDate", source = "appointmentDate")
     @Mapping(target = "clientNote", source = "clientNote")
     @Mapping(target = "internalNote", source = "internalNote")
-    // services will be set in service layer using serviceIds
+    @Mapping(target = "addresse", source = "addresse")
+        // services will be set in service layer using serviceIds
     Booking toEntity(CreateBookingRequestDTO dto);
 
     @Mapping(target = "services", source = "services")

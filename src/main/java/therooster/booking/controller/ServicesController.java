@@ -41,7 +41,7 @@ public class ServicesController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('READ_SERVICE')")
     public ResponseEntity<List<LireServiceDTO>> list() {
         return ResponseEntity.ok(servicesService.listServices());
     }
