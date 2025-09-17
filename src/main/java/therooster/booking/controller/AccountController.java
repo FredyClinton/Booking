@@ -5,22 +5,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import therooster.booking.config.security.JwtService;
 import therooster.booking.dto.request.AuthenticationDTO;
+import therooster.booking.dto.request.ChangePasswordDTO;
 import therooster.booking.dto.request.CreateUserRequestDTO;
+import therooster.booking.dto.response.LireUserDTO;
 import therooster.booking.mapper.UserEntityMapper;
 import therooster.booking.service.UsersService;
 
-import java.net.URI;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/accounts", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AccountController {
 
@@ -35,14 +40,14 @@ public class AccountController {
 
 
         this.utilisateurService.inscription(dto);
-        return ResponseEntity.created(URI.create("Inscription réussie. Activez votre compte")).build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/activation")
-    public ResponseEntity<Void> activation(@RequestBody Map<String, String> activation) {
+    public ResponseEntity<String> activation(@RequestBody Map<String, String> activation) {
 
-        this.utilisateurService.activation(activation);
-        return ResponseEntity.noContent().build();
+        this.utilisateurService.activeAccount(activation);
+        return ResponseEntity.ok("Compte activé");
     }
 
     @PostMapping(path = "/connexion")
@@ -71,14 +76,14 @@ public class AccountController {
     @PostMapping(path = "/change-password")
     public ResponseEntity<Void> modifierMotDePasse(@RequestBody Map<String, String> email) {
         // TODO: implement methode
-        this.utilisateurService.modifierMotDePasse(email);
+        this.utilisateurService.sendCodeToChangePasseword(email);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/new-password")
-    public ResponseEntity<Void> nouveauMotDePasse(@RequestBody Map<String, String> email) {
+    public ResponseEntity<Void> newPassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         // TODO: implement methode
-        this.utilisateurService.nouveauMotDePasse(email);
+        this.utilisateurService.changePassword(changePasswordDTO);
         return ResponseEntity.noContent().build();
     }
 
@@ -86,5 +91,21 @@ public class AccountController {
     public @ResponseBody Map<String, String> refreshToken(@RequestBody Map<String, String> params) {
         // TODO: implement methode
         return this.jwtService.refreshToken(params);
+    }
+
+    @GetMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public ResponseEntity<List<LireUserDTO>> getsAccounts() {
+        List<LireUserDTO> users = this.utilisateurService.getAllUsersWithoutPassword();
+        return ResponseEntity.ok(users);
+    }
+
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable UUID accountId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserUsername = authentication.getName();
+        this.utilisateurService.deleteUser(accountId, currentUserUsername);
+        return ResponseEntity.noContent().build();
+
     }
 }

@@ -14,16 +14,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendValidationEmail(Validation validation) {
+        System.out.println("sendMail");
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom("no-reply@therooster.com");
-        mailMessage.setTo(validation.getUtilisateur().getEmail());
+        mailMessage.setTo(validation.getUser().getEmail());
         mailMessage.setSubject("Votre code d'activation");
 
         String content = String.format("Bonjour %s, <br/> vote code d'activation est  %s",
-                validation.getUtilisateur().getFirstName(), validation.getCode());
+                validation.getUser().getFirstName(), validation.getCode());
 
         mailMessage.setText(content);
-
+        System.out.println("sent content");
         javaMailSender.send(mailMessage);
+        System.out.println("mail envoyé");
     }
 }

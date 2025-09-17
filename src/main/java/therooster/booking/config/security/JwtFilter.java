@@ -33,14 +33,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
             final String authHeader = request.getHeader("Authorization");
-            if (authHeader != null) {
+            if (authHeader != null && authHeader.startsWith("Bearer ") && authHeader.length() > 7) {
                 token = authHeader.substring(7);
                 // tokenDansLBd = jwtService.tokenByValue(token);
                 username = jwtService.extractUsername(token);
                 isTokenExpired = jwtService.isTokenExpired(token);
             }
 
-            if (!isTokenExpired
+            if (username != null && !isTokenExpired
                     //   && tokenDansLBd.getUtilisateur().getUsername().equals(username)
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = utilisateurService.loadUserByUsername(username);

@@ -23,7 +23,7 @@ public class Validation extends BaseIdUuid {
     private String code;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
-    private UserEntity utilisateur;
+    private UserEntity user;
 
 }
 

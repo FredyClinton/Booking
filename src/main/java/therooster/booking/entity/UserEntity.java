@@ -26,6 +26,7 @@ public abstract class UserEntity extends BaseIdUuid implements UserDetails {
     protected String firstName;
     protected String lastName;
     protected String password;
+    @Column(unique = true, nullable = false)
     protected String email;
     protected String phone;
     protected Date birthDate;
@@ -36,8 +37,13 @@ public abstract class UserEntity extends BaseIdUuid implements UserDetails {
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private boolean actif = false;
 
-    @OneToMany(fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Addresse> addresses;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Role role;

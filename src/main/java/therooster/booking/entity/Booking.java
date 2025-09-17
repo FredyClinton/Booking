@@ -9,6 +9,8 @@ import lombok.Setter;
 import therooster.booking.enums.BookingStatus;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bookings")
@@ -21,7 +23,6 @@ public class Booking extends BaseIdUuid {
     private Instant appointmentDate;
     private String clientNote;
     private String internalNote;
-    private Double price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -29,5 +30,26 @@ public class Booking extends BaseIdUuid {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private Addresse addresse;
+
+    // Many-to-Many: a booking can be handled by multiple employees
+    @ManyToMany
+    @JoinTable(
+            name = "booking_employees",
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id")
+    )
+    private Set<Employee> employees = new HashSet<>();
+
+    // Many-to-Many: a booking can include multiple services
+    @ManyToMany
+    @JoinTable(
+            name = "booking_services",
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id")
+    )
+    private Set<ServiceEntity> services = new HashSet<>();
 
 }
